@@ -1,0 +1,708 @@
+/*********************************************************************************************************************
+ * COPYRIGHT NOTICE
+ * Copyright (c) 2019,Öð·É¿Æ¼¼
+ * All rights reserved.
+ * ¼¼ÊõÌÖÂÛQQÈº£ºÒ»Èº£º179029047(ÒÑÂú)  ¶þÈº£º244861897
+ *
+ * ÒÔÏÂËùÓÐÄÚÈÝ°æÈ¨¾ùÊôÖð·É¿Æ¼¼ËùÓÐ£¬Î´¾­ÔÊÐí²»µÃÓÃÓÚÉÌÒµÓÃÍ¾£¬
+ * »¶Ó­¸÷Î»Ê¹ÓÃ²¢´«²¥±¾³ÌÐò£¬ÐÞ¸ÄÄÚÈÝÊ±±ØÐë±£ÁôÖð·É¿Æ¼¼µÄ°æÈ¨ÉùÃ÷¡£
+ *
+ * @file       		pwm
+ * @company	   		³É¶¼Öð·É¿Æ¼¼ÓÐÏÞ¹«Ë¾
+ * @author     		Öð·É¿Æ¼¼(QQ3184284598)
+ * @version    		²é¿´docÄÚversionÎÄ¼þ °æ±¾ËµÃ÷
+ * @Software 		IAR 8.3 or MDK 5.28
+ * @Target core		NXP RT1064DVL6A
+ * @Taobao   		https://seekfree.taobao.com/
+ * @date       		2019-04-30
+ ********************************************************************************************************************/
+
+
+#include "zf_iomuxc.h"
+#include "zf_pwm.h"
+
+#define PI 3.1415926;
+#define PWM_SRC_CLK_FREQ    CLOCK_GetFreq(kCLOCK_IpgClk)        //¶¨ÒåPWMÊäÈëÊ±ÖÓÔ´ÆµÂÊ
+#define PWM_PIN_CONF        SPEED_100MHZ | KEEPER_EN | DSE_R0_6 //ÅäÖÃPWMÒý½ÅÄ¬ÈÏÅäÖÃ   
+
+static PWM_Type * PWMPTR[] = PWM_BASE_PTRS;
+
+
+void pwm_iomuxc(PWMCH_enum pwmch)
+{
+    switch(pwmch)
+    {
+        case PWM1_MODULE0_CHA_D12:  iomuxc_pinconf(D12,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE0_CHA_E23:  iomuxc_pinconf(E23,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE0_CHB_D13:  iomuxc_pinconf(D13,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE0_CHB_E24:  iomuxc_pinconf(E24,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE1_CHA_D14:  iomuxc_pinconf(D14,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE1_CHA_E25:  iomuxc_pinconf(E25,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE1_CHB_D15:  iomuxc_pinconf(D15,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE1_CHB_E26:  iomuxc_pinconf(E26,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE2_CHA_D16:  iomuxc_pinconf(D16,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE2_CHA_E27:  iomuxc_pinconf(E27,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE2_CHB_D17:  iomuxc_pinconf(D17,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE2_CHB_E28:  iomuxc_pinconf(E28,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM1_MODULE3_CHA_B10:  iomuxc_pinconf(B10,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHA_C16:  iomuxc_pinconf(C16,ALT6,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHA_D0 :  iomuxc_pinconf(D0 ,ALT2,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHA_D24:  iomuxc_pinconf(D24,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHA_E12:  iomuxc_pinconf(E12,ALT4,PWM_PIN_CONF); break;
+                                                   
+                                                   
+        case PWM1_MODULE3_CHB_B11:  iomuxc_pinconf(B11,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHB_C17:  iomuxc_pinconf(C17,ALT6,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHB_D1 :  iomuxc_pinconf(D1 ,ALT2,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHB_D25:  iomuxc_pinconf(D25,ALT1,PWM_PIN_CONF); break;
+        case PWM1_MODULE3_CHB_E13:  iomuxc_pinconf(E13,ALT4,PWM_PIN_CONF); break;
+                                                   
+                                                   
+                                                   
+        case PWM2_MODULE0_CHA_C6 :  iomuxc_pinconf(C6 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE0_CHA_E6 :  iomuxc_pinconf(E6 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE0_CHB_C7 :  iomuxc_pinconf(C7 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE0_CHB_E7 :  iomuxc_pinconf(E7 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE1_CHA_C8 :  iomuxc_pinconf(C8 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE1_CHA_E8 :  iomuxc_pinconf(E8 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE1_CHB_C9 :  iomuxc_pinconf(C9 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE1_CHB_E9 :  iomuxc_pinconf(E9 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE2_CHA_C10:  iomuxc_pinconf(C10,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE2_CHA_E10:  iomuxc_pinconf(E10,ALT1,PWM_PIN_CONF); break;
+
+        case PWM2_MODULE2_CHB_C11:  iomuxc_pinconf(C11,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE2_CHB_E11:  iomuxc_pinconf(E11,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE3_CHA_B0 :  iomuxc_pinconf(B0 ,ALT1,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHA_C18:  iomuxc_pinconf(C18,ALT6,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHA_D2 :  iomuxc_pinconf(D2 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHA_E19:  iomuxc_pinconf(E19,ALT1,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHA_B9 :  iomuxc_pinconf(B9 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM2_MODULE3_CHB_B1 :  iomuxc_pinconf(B1 ,ALT1,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHB_C19:  iomuxc_pinconf(C19,ALT6,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHB_D3 :  iomuxc_pinconf(D3 ,ALT2,PWM_PIN_CONF); break;
+        case PWM2_MODULE3_CHB_E20:  iomuxc_pinconf(E20,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE0_CHA_E29:  iomuxc_pinconf(E29,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE0_CHB_E30:  iomuxc_pinconf(E30,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE1_CHA_E31:  iomuxc_pinconf(E31,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE1_CHB_D18:  iomuxc_pinconf(D18,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE2_CHA_D19:  iomuxc_pinconf(D19,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE2_CHB_D20:  iomuxc_pinconf(D20,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE3_CHA_E21:  iomuxc_pinconf(E21,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM3_MODULE3_CHB_E22:  iomuxc_pinconf(E22,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE0_CHA_B24:  iomuxc_pinconf(B24,ALT1,PWM_PIN_CONF); break;
+        case PWM4_MODULE0_CHA_E0 :  iomuxc_pinconf(E0 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE0_CHB_E1 :  iomuxc_pinconf(E1 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE1_CHA_B25:  iomuxc_pinconf(B25,ALT1,PWM_PIN_CONF); break;
+        case PWM4_MODULE1_CHA_E2 :  iomuxc_pinconf(E2 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE1_CHB_E3 :  iomuxc_pinconf(E3 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE2_CHA_C30:  iomuxc_pinconf(C30,ALT1,PWM_PIN_CONF); break;
+        case PWM4_MODULE2_CHA_E4 :  iomuxc_pinconf(E4 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE2_CHB_E5 :  iomuxc_pinconf(E5 ,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE3_CHA_C31:  iomuxc_pinconf(C31,ALT1,PWM_PIN_CONF); break;
+        case PWM4_MODULE3_CHA_E17:  iomuxc_pinconf(E17,ALT1,PWM_PIN_CONF); break;
+                                                   
+        case PWM4_MODULE3_CHB_E18:  iomuxc_pinconf(E18,ALT1,PWM_PIN_CONF); break;
+
+        default :assert(0);break;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+//  @brief      PWM³õÊ¼»¯
+//  @param      pwmch       PWMÍ¨µÀºÅ¼°Òý½Å
+//  @param      freq        PWMÆµÂÊ
+//  @param      duty        PWMÕ¼¿Õ±È
+//  @return     void
+//  Sample usage:           pwm_init(PWM1_MODULE0_CHB_D13, 50, 5000);     //³õÊ¼»¯PWM1  ×ÓÄ£¿é0 Í¨µÀB Ê¹ÓÃÒý½ÅD13  Êä³öPWMÆµÂÊ50HZ   Õ¼¿Õ±ÈÎª°Ù·ÖÖ® 5000/PWM_DUTY_MAX*100
+//							PWM_DUTY_MAXÔÚfsl_pwm.hÎÄ¼þÖÐ Ä¬ÈÏÎª50000 
+//-------------------------------------------------------------------------------------------------------------------
+void pwm_init(PWMCH_enum pwmch, uint32 freq, uint32 duty)
+{
+    uint8  pwm_num;
+    uint8  pwm_module;
+    uint8  pwm_module_ch;
+    uint32 temp_prsc;
+    pwm_config_t pwmConfig;
+    
+    pwm_iomuxc(pwmch);
+
+    //pwmConfig.enableDebugMode = false;
+    //pwmConfig.enableWait = false;
+    //pwmConfig.reloadSelect = kPWM_LocalReload;
+    //pwmConfig.faultFilterCount = 0;
+    //pwmConfig.faultFilterPeriod = 0;
+    //pwmConfig.clockSource = kPWM_BusClock;
+    //pwmConfig.prescale = kPWM_Prescale_Divide_1;
+    //pwmConfig.initializationControl = kPWM_Initialize_LocalSync;
+    //pwmConfig.forceTrigger = kPWM_Force_Local;
+    //pwmConfig.reloadFrequency = kPWM_LoadEveryOportunity;
+    //pwmConfig.reloadLogic = kPWM_ReloadImmediate;
+    //pwmConfig.pairOperation = kPWM_Independent;
+
+    PWM_GetDefaultConfig(&pwmConfig);
+
+    pwmConfig.reloadLogic = kPWM_ReloadPwmFullCycle;
+    pwmConfig.pairOperation = kPWM_Independent;
+    pwmConfig.enableDebugMode = true;
+    
+
+    //¼ÆËã·ÖÆµÏµÊý
+    temp_prsc = (PWM_SRC_CLK_FREQ/freq)>>16;
+	if(PWM_SRC_CLK_FREQ%(freq<<16))	temp_prsc++;
+
+    if      (1   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_1;
+    else if (2   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_2;
+    else if (4   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_4;
+    else if (8   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_8;
+    else if (16  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_16;
+    else if (32  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_32;
+    else if (64  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_64;
+    else if (128 >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_128;
+    else
+    {
+        assert(0) ;//ÆµÂÊ¹ýÐ¡ »òÕßIPGÆµÂÊ¹ý¸ß
+    }
+
+    pwm_num = pwmch/40;             //¼ÆËãÄ£¿é±àºÅ
+    pwm_module = pwmch%40/10;       //¼ÆËã×ÓÄ£¿é±àºÅ
+    pwm_module_ch = pwmch%40%10/5;  //¼ÆËã×ÓÄ£¿éµÄÍ¨µÀ
+    //³õÊ¼»¯PWMÄ£¿é 
+    if (PWM_Init(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, &pwmConfig) == kStatus_Fail)//µÚÒ»´Î³õÊ¼»¯±ãÓÚ´ò¿ªÊ±ÖÓ
+    {
+        assert(0) ;//³õÊ¼»¯Ê§°Ü
+    }
+    PWM_Deinit(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module);
+    
+    if (PWM_Init(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, &pwmConfig) == kStatus_Fail)//ÖØÐÂ³õÊ¼»¯ÉèÖÃÕýÈ·µÄ²ÎÊý
+    {
+        assert(0) ;//³õÊ¼»¯Ê§°Ü
+    }
+
+    //ÉèÖÃÆµÂÊÕ¼¿Õ±ÈµÈ²ÎÊý
+    pwm_signal_param_t pwmSignal;
+
+    pwmSignal.pwmChannel = (pwm_channels_t)(pwm_module_ch); 
+    pwmSignal.level = kPWM_HighTrue;
+    pwmSignal.dutyCyclePercent = duty;  //PWM_DUTY_MAX
+    pwmSignal.deadtimeValue = 0;//((uint64_t)PWM_SRC_CLK_FREQ * 650) / 1000000000;
+
+    //Çå³ýLOAD OKAYÎ»  ÒÔÉèÖÃÐÂµÄ²ÎÊý
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), false);
+    PWM_SetupPwm(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, &pwmSignal, 1, kPWM_EdgeAligned, freq, PWM_SRC_CLK_FREQ);     
+    //ÉèÖÃLOAD OKAYÎ»  ÒÔ¸üÐÂÉèÖÃ
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), true);
+
+    //Æô¶¯¶¨Ê±Æ÷
+    PWM_StartTimer(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)));
+    
+    PWMPTR[pwm_num]->SM[pwm_module].DISMAP[0]=0;
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+//  @brief      PWMÕ¼¿Õ±ÈÉèÖÃ
+//  @param      pwmch       PWMÍ¨µÀºÅ¼°Òý½Å
+//  @param      freq        PWMÆµÂÊ
+//  @param      duty        PWMÕ¼¿Õ±È
+//  @return     void
+//  Sample usage:           pwm_duty(PWM1_MODULE0_CHB_D13, 5000);     //ÉèÖÃÕ¼¿Õ±ÈÎª°Ù·ÖÖ® 5000/PWM_DUTY_MAX*100
+//							PWM_DUTY_MAXÔÚfsl_pwm.hÎÄ¼þÖÐ Ä¬ÈÏÎª50000
+//-------------------------------------------------------------------------------------------------------------------
+void pwm_duty(PWMCH_enum pwmch, uint32 duty)
+{
+    uint8  pwm_num;
+    uint8  pwm_module;
+    uint8  pwm_module_ch;
+    
+    pwm_num = pwmch/40;             //¼ÆËãÄ£¿é±àºÅ
+    pwm_module = pwmch%40/10;       //¼ÆËã×ÓÄ£¿é±àºÅ
+    pwm_module_ch = pwmch%40%10/5;  //¼ÆËã×ÓÄ£¿éµÄÍ¨µÀ
+    
+    //Çå³ýLOAD OKAYÎ»  ÒÔÉèÖÃÐÂµÄ²ÎÊý
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), false);
+    PWM_UpdatePwmDutycycle(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, (pwm_channels_t)(pwm_module_ch), kPWM_EdgeAligned, duty);
+    //ÉèÖÃLOAD OKAYÎ»  ÒÔ¸üÐÂÉèÖÃ
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), true);
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+//  @brief      PWMÆµÂÊÉèÖÃ
+//  @param      pwmch       PWMÍ¨µÀºÅ¼°Òý½Å
+//  @param      freq        PWMÆµÂÊ
+//  @param      duty        PWMÕ¼¿Õ±È
+//  @return     void
+//  Sample usage:           pwm_freq(PWM1_MODULE0_CHB_D13, 50);     //ÉèÖÃÆµÂÊÎª50HZ   
+//-------------------------------------------------------------------------------------------------------------------
+void pwm_freq(PWMCH_enum pwmch, uint32 freq, uint32 duty)
+{
+    uint8  pwm_num;
+    uint8  pwm_module;
+    uint8  pwm_module_ch;
+
+    uint16 temp_prsc;
+    pwm_config_t pwmConfig;
+
+    PWM_GetDefaultConfig(&pwmConfig);
+
+    pwmConfig.reloadLogic = kPWM_ReloadPwmFullCycle;
+    pwmConfig.pairOperation = kPWM_Independent;
+    pwmConfig.enableDebugMode = true;
+    
+    //¼ÆËã·ÖÆµÏµÊý
+    temp_prsc = (PWM_SRC_CLK_FREQ/freq)>>16;
+    if      (1   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_1;
+    else if (2   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_2;
+    else if (4   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_4;
+    else if (8   >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_8;
+    else if (16  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_16;
+    else if (32  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_32;
+    else if (64  >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_64;
+    else if (128 >= temp_prsc)  pwmConfig.prescale = kPWM_Prescale_Divide_128;
+    else
+    {
+        assert(0) ;//ÆµÂÊ¹ýÐ¡ »òÕßIPGÆµÂÊ¹ý¸ß
+    }
+    
+    pwm_num = pwmch/40;             //¼ÆËãÄ£¿é±àºÅ
+    pwm_module = pwmch%40/10;       //¼ÆËã×ÓÄ£¿é±àºÅ
+    pwm_module_ch = pwmch%40%10/5;  //¼ÆËã×ÓÄ£¿éµÄÍ¨µÀ
+    
+    //³õÊ¼»¯PWMÄ£¿é 
+    if (PWM_Init(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, &pwmConfig) == kStatus_Fail)
+    {
+        assert(0) ;//³õÊ¼»¯Ê§°Ü
+    }
+
+    //ÉèÖÃÆµÂÊÕ¼¿Õ±ÈµÈ²ÎÊý
+    pwm_signal_param_t pwmSignal;
+
+    pwmSignal.pwmChannel = (pwm_channels_t)(pwm_module_ch); 
+    pwmSignal.level = kPWM_HighTrue;
+    pwmSignal.dutyCyclePercent = duty;  //PWM_DUTY_MAX
+    pwmSignal.deadtimeValue = 0;//((uint64_t)PWM_SRC_CLK_FREQ * 650) / 1000000000;
+    
+    //Çå³ýLOAD OKAYÎ»  ÒÔÉèÖÃÐÂµÄ²ÎÊý
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), false);
+    PWM_SetupPwm(PWMPTR[pwm_num], (pwm_submodule_t)pwm_module, &pwmSignal, 1, kPWM_EdgeAligned, freq, PWM_SRC_CLK_FREQ);     
+    //ÉèÖÃLOAD OKAYÎ»  ÒÔ¸üÐÂÉèÖÃ
+    PWM_SetPwmLdok(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)), true);
+
+    //Æô¶¯¶¨Ê±Æ÷
+    PWM_StartTimer(PWMPTR[pwm_num], (pwm_module_control_t)(1<<(pwm_module)));
+    
+    PWMPTR[pwm_num]->SM[pwm_module].DISMAP[0]=0;
+}
+
+int32 motor1,motor2;
+
+void motor_ctr(motor1,motor2)// set the speed to motor group 1&2
+{
+	if(!(motor1==0 &&motor2==0))                   //set speed
+			{
+				if(motor1>=0 && motor2>=0){                 //forward
+				 pwm_duty(PWM1_MODULE3_CHA_D0, motor1); 
+				 pwm_duty(PWM2_MODULE3_CHA_D2, 0);
+			 	 pwm_duty(PWM1_MODULE3_CHB_D1, motor2);
+				 pwm_duty(PWM2_MODULE3_CHB_D3, 0);
+				}
+				else if(motor1<0 && motor2>=0){            //left backward, right forward
+				 pwm_duty(PWM1_MODULE3_CHA_D0, 0); 
+				 pwm_duty(PWM2_MODULE3_CHA_D2, -motor1);
+			 	 pwm_duty(PWM1_MODULE3_CHB_D1, motor2);
+				 pwm_duty(PWM2_MODULE3_CHB_D3, 0);
+				}
+				else if(motor1>=0 && motor2<0){            //left forward, right backward
+				 pwm_duty(PWM1_MODULE3_CHA_D0, motor1); 
+				 pwm_duty(PWM2_MODULE3_CHA_D2, 0);
+			 	 pwm_duty(PWM1_MODULE3_CHB_D1, 0);
+				 pwm_duty(PWM2_MODULE3_CHB_D3, -motor2);
+				}
+				else if(motor1<0 && motor2<0){            //backward
+				 pwm_duty(PWM1_MODULE3_CHA_D0, 0); 
+				 pwm_duty(PWM2_MODULE3_CHA_D2, -motor1);
+			 	 pwm_duty(PWM1_MODULE3_CHB_D1, 0);
+				 pwm_duty(PWM2_MODULE3_CHB_D3, -motor2);
+				}
+			 }		 
+	 else if(motor1==0 &&motor2==0)                 //stop
+{
+         pwm_duty(PWM1_MODULE3_CHA_D0, 50000); 
+				 pwm_duty(PWM2_MODULE3_CHA_D2, 50000);
+			 	 pwm_duty(PWM1_MODULE3_CHB_D1, 50000);
+				 pwm_duty(PWM2_MODULE3_CHB_D3, 50000);
+}
+}
+//turn left part
+void motor_TL1(speed){                          
+     motor1=375*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_TL2(speed){
+	   motor1=250*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_TL3(speed){
+	   motor1=125*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+		 motor_ctr(motor1,motor2);
+}
+void motor_TL4(speed){
+	   motor1=0*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+		 motor_ctr(motor1,motor2);
+}
+void motor_TL5(speed){
+	   motor1=-500*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+		 motor_ctr(motor1,motor2);
+}
+//move forward & backward
+void motor_MF(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=500*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_MB(speed){
+	   motor1=-500*(0.3*speed+70);
+	   motor2=-500*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+// turn right part
+void motor_TR1(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=375*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_TR2(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=250*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+	 
+}
+void motor_TR3(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=125*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_TR4(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=0*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_TR5(speed){
+     motor1=500*(0.3*speed+70);
+	   motor2=-500*(0.3*speed+70);
+	   motor_ctr(motor1,motor2);
+}
+void motor_STP(){
+	   motor1=0;
+	   motor2=0;
+	   motor_ctr(motor1,motor2);
+}
+
+
+
+
+//multi-state
+void automotor(speed,Xmidpoint,Ymidpoint,degree){
+	   int leftmotor,rightmotor;             //range -100~-1,1~100 (-100%~-70%speed)(70%~100%speed). if 0 means stop
+	   float turningparameter,multi;                           //16region ,ABCDEF direction
+	   float Xparameter,Dparameter;
+	   int n;
+	   //Y axis multi;
+	   if(50<Ymidpoint&&Ymidpoint<=100){
+		   multi=0.75;
+		 }
+		 else if(0<Ymidpoint&&Ymidpoint<=50){
+		   multi=1;
+		 }
+		 else if(-50<Ymidpoint&&Ymidpoint<=0){
+		   multi=1.5;
+		 }
+		 else if(-100<=Ymidpoint&&Ymidpoint<=-50){
+		   multi=2;
+		 }
+		 //X axis parameter;
+	   if(50<Xmidpoint&&Xmidpoint<=100){
+		   Xparameter=16;
+		 }
+		 else if(15<Xmidpoint&&Xmidpoint<=50){
+		   Xparameter=1;
+		 }
+		 else if(-15<=Xmidpoint&&Xmidpoint<=15){
+		   Xparameter=0;
+		 }
+		 else if(-50<Xmidpoint&&Xmidpoint<15){
+		   Xparameter=-1;
+		 }
+		 else if(-100<=Xmidpoint&&Xmidpoint<=-50){
+		   Xparameter=-16;
+		 }
+		 //degree parameter;
+		 if(82<degree&&degree<=90){
+		   Dparameter=0;
+		 }
+		 else if(60<degree&&degree<=82){
+			 Dparameter=16;
+		 }
+		 else if(30<degree&&degree<=60){
+			 Dparameter=30;
+		 }
+		 else if(0<degree&&degree<=30){
+			 Dparameter=60;
+		 }
+		 else if(-30<degree&&degree<=0){
+			 Dparameter=-60;
+		 }
+		 else if(-60<degree&&degree<=-30){
+			 Dparameter=-30;
+		 }
+		 else if(-82<=degree&&degree<=-60){
+			 Dparameter=-16;
+		 }
+		 else if(-90<=degree&&degree<-82){
+			 Dparameter=0;
+		 }
+		 //final equation
+		 turningparameter=multi*Xparameter+Dparameter;
+		 
+		 //motor control -100~10
+		 if(-100<=turningparameter&&turningparameter<=-50){
+		   motor_TL5(25);
+		 }
+		 else if(-50<=turningparameter&&turningparameter<-40){
+		   motor_TL4(50);
+		 }
+		 else if(-40<=turningparameter&&turningparameter<-30){
+		   motor_TL3(70);
+		 }
+		 else if(-30<=turningparameter&&turningparameter<-20){
+		   motor_TL2(80);
+		 }
+		 else if(-20<=turningparameter&&turningparameter<-10){
+		   motor_TL1(90);
+		 }
+		 else if(-10<=turningparameter&&turningparameter<10){
+		   motor_MF(100);
+		 }
+		 //motor control 10~100
+		 else if(10<=turningparameter&&turningparameter<20){
+		   motor_TR1(90);
+		 }
+		 else if(20<=turningparameter&&turningparameter<30){
+		   motor_TR2(80);
+		 }
+		 else if(30<=turningparameter&&turningparameter<40){
+		   motor_TR3(70);
+		 }	 
+		 else if(40<=turningparameter&&turningparameter<50){
+		   motor_TR4(50);
+		 } 
+		 else if(50<=turningparameter&&turningparameter<=100){
+		   motor_TR5(25);
+		 }		 
+	  	//switch case solution
+     /*for(n=1;n<9;n++){                           // midpoint on the x-axis
+		 if(((Xmidpoint>=(25*(n-5)))&&((25*(n-4))>=Xmidpoint))){
+			 region=n;
+		 }
+
+     switch(region){
+			 case 1: //-100~-75
+				 if(60<=degree&&degree<90){
+					 leftmotor=25;
+					 rightmotor=75;
+				 }
+				 else if(30<=degree&&degree<60){      //not exist
+					 leftmotor=50;
+					 rightmotor=50;
+         }
+				 else if(0<=degree&&degree<30){      //not exist
+					 leftmotor=100;
+					 rightmotor=25;
+				 }
+				 else if(-30<=degree&&degree<0){     //not exist
+					 leftmotor=-50;
+					 rightmotor=50;
+         }
+				 else if(-60<=degree&&degree<-30){   //not exist
+					 leftmotor=0;
+					 rightmotor=100;
+				 }
+				 else if(-90<=degree&&degree<-60){
+					 leftmotor=0;
+					 rightmotor=100;
+				 }
+			 break;
+			 case 2:  //-75~-50
+				 if(60<=degree&&degree<90){
+					 leftmotor=50;
+					 rightmotor=50;
+				 }
+				 else if(30<=degree&&degree<60){     //not exist
+
+         }
+				 else if(0<=degree&&degree<30){      //not exist
+
+				 }
+				 else if(-30<=degree&&degree<0){     //not exist
+         }
+				 else if(-60<=degree&&degree<-30){   //not exist
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 3:  //-50~-25
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 4:  //-25~0
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 5:  //0~25
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 6:  //25~50
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 7:  //50~75
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 case 8:  //75~100
+				 if(60<=degree&&degree<90){
+				 }
+				 else if(30<=degree&&degree<60){
+         }
+				 else if(0<=degree&&degree<30){
+				 }
+				 else if(-30<=degree&&degree<0){
+         }
+				 else if(-60<=degree&&degree<-30){
+				 }
+				 else if(-90<=degree&&degree<-60){
+				 }
+			 break;
+			 default:
+				 
+			 break;
+		 }
+
+		 
+ 		 if(leftmotor<0){
+		 motor1=5*leftmotor*(0.3*speed-70);
+		 }
+		 else if(leftmotor==0){
+		 motor1=0;
+		 }
+		 else if(leftmotor>0){
+		 motor1=5*leftmotor*(0.3*speed+70);
+		 }
+     if(rightmotor<0){
+		 motor2=5*rightmotor*(0.3*speed-70);
+		 }
+		 else if(rightmotor==0){
+		 motor2=0;
+		 }
+		 else if(rightmotor>0){
+		 motor2=5*rightmotor*(0.3*speed+70);
+		 }
+     motor_ctr(motor1,motor2);
+		 */
+}
+/**/
+
+
+//one autofunction
+/*
+void automotor(speed,Xmidpoint,slope){
+     int visiondistance,turningradius,leftmotor,rightmotor;
+     visiondistance=50;            //length
+	   turningradius=
+	   motor1=
+	   motor2=
+
+
+}
+*/

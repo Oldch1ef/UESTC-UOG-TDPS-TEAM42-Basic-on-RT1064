@@ -1,0 +1,10 @@
+DisableGlobalIRQ();
+    board_init(); //Initializing 
+    systick_delay_ms(300);
+	  pwm_init(PWM1_MODULE3_CHA_D0,17000,0); //D0 motor group1(left) forward  // maximum duty cycle is defined as 50000
+		pwm_init(PWM1_MODULE3_CHB_D1,17000,0); //D1 motor group2(right) forward
+		pwm_init(PWM2_MODULE3_CHA_D2,17000,0); //D2 motor group1(left) backward
+		pwm_init(PWM2_MODULE3_CHB_D3,17000,0); //D3 motor group2(right) backward
+	  systick_delay_ms(1000);
+      //main function
+			EnableGlobalIRQ(0);

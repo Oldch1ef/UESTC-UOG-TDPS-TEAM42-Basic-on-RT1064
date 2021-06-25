@@ -1,0 +1,59 @@
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%PRVDR%
+CatalogFile.nt	= SEEKFREE_Virtual_COM_X86.cat
+CatalogFile.ntx86	= SEEKFREE_Virtual_COM_X86.cat
+DriverVer=12/07/2018,1.0.0
+
+[SourceDisksNames]
+1=%DriversDisk%,,,
+
+[SourceDisksFiles]
+
+[Manufacturer]
+%MFGNAME%=DeviceList,NT,NTamd64
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+;------------------------------------------------------------------------------
+;            VID/PID Settings
+;------------------------------------------------------------------------------
+[DeviceList.NT]
+%DESCRIPTION%=DriverInstall,USB\VID_C251&PID_F00A&MI_01
+
+[DeviceList.NTamd64]
+%DESCRIPTION%=DriverInstall,USB\VID_C251&PID_F00A&MI_01
+
+[DriverInstall.NT]
+Include=mdmcpq.inf
+CopyFiles=FakeModemCopyFileSection
+AddReg=DriverInstall.NT.AddReg
+
+[DriverInstall.NT.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.NT.Services]
+AddService=usbser, 0x00000002, DriverServiceInst
+
+[DriverServiceInst]
+DisplayName=%SERVICE%
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER
+StartType = 3 ; SERVICE_DEMAND_START
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary= %12%\usbser.sys
+LoadOrderGroup = Base
+
+;------------------------------------------------------------------------------
+;              String Definitions
+;------------------------------------------------------------------------------
+
+[Strings]
+PRVDR = "ChengDu SEEKFREE Technology Co.,Ltd"
+MFGNAME = "ChengDu SEEKFREE Technology Co.,Ltd"
+DESCRIPTION = "SEEKFREE DAP COM Port"
+SERVICE = "SEEKFREE DAP Virtual COM Port"
